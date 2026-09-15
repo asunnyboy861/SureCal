@@ -30,10 +30,10 @@
 
 | Page | URL | Status |
 |------|-----|--------|
-| Landing Page | https://asunnyboy861.github.io/SureCal/ | ⏳ Pending |
-| Support | https://asunnyboy861.github.io/SureCal/support.html | ⏳ Pending |
-| Privacy Policy | https://asunnyboy861.github.io/SureCal/privacy.html | ⏳ Pending |
-| Terms of Use | https://asunnyboy861.github.io/SureCal/terms.html | ⏳ Pending |
+| Landing Page | https://asunnyboy861.github.io/SureCal/ | ✅ Active |
+| Support | https://asunnyboy861.github.io/SureCal/support.html | ✅ Active |
+| Privacy Policy | https://asunnyboy861.github.io/SureCal/privacy.html | ✅ Active |
+| Terms of Use | https://asunnyboy861.github.io/SureCal/terms.html | ✅ Active |
 
 ## Repository Structure
 
