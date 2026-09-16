@@ -1,6 +1,7 @@
 .env
 keytext*.md
 COMPETITOR_REPORT.md
+GLMSecret.txt
 .DS_Store
 xcuserdata/
 DerivedData/

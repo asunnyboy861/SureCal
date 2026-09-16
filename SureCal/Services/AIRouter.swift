@@ -1,5 +1,16 @@
 import Foundation
 
+struct UnconfiguredEngine: VisionNutritionEngine {
+    let engineID = "unconfigured"
+    var errorDescription: String {
+        "AI engine is not configured on this build. Add your own API key in Settings - AI Engine to enable photo scanning."
+    }
+
+    func analyze(imageData: Data, context: MealContext) async throws -> FoodAnalysis {
+        throw VisionEngineError.badResponse
+    }
+}
+
 enum AIRouter {
     static func primaryEngine() -> VisionNutritionEngine {
         if let key = KeychainHelper.readString(service: "SureCal", account: "byo_api_key"), !key.isEmpty {
@@ -8,7 +19,10 @@ enum AIRouter {
             let endpoint = URL(string: endpointString) ?? GLMConfig.endpoint
             return BYOVisionEngine(apiKey: key, endpoint: endpoint, model: model)
         }
-        return GLMFlashVisionEngine()
+        if GLMConfig.isConfigured {
+            return GLMFlashVisionEngine()
+        }
+        return UnconfiguredEngine()
     }
 
     static func verifyEngine() -> VisionNutritionEngine {
