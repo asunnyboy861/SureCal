@@ -9,21 +9,42 @@ enum VisionEngineError: LocalizedError {
     case badResponse
     case http(Int, String)
     case parseFailed
+    case notConfigured
 
     var errorDescription: String? {
         switch self {
         case .badResponse: return "The AI service returned an unexpected response."
         case .http(let code, let body): return "AI service error (\(code)): \(body.prefix(120))"
         case .parseFailed: return "Could not read the analysis result."
+        case .notConfigured: return "AI engine is not configured on this build. Add your own API key in Settings - AI Engine to enable photo scanning."
         }
     }
 }
 
 struct GLMFlashVisionEngine: VisionNutritionEngine {
     let engineID = "ai_glm"
+    let profiles: [GLMProfile]
+
+    init(profiles: [GLMProfile]? = nil) {
+        self.profiles = profiles ?? GLMConfig.profiles
+    }
 
     func analyze(imageData: Data, context: MealContext) async throws -> FoodAnalysis {
-        try await Self.performCall(endpoint: GLMConfig.endpoint, apiKey: GLMConfig.apiKey, model: GLMConfig.model, imageData: imageData, context: context)
+        guard !profiles.isEmpty else { throw VisionEngineError.notConfigured }
+        var lastError: Error = VisionEngineError.badResponse
+        for profile in profiles {
+            do {
+                return try await Self.performCall(endpoint: profile.endpoint, apiKey: profile.apiKey, model: profile.model, imageData: imageData, context: context)
+            } catch let error as VisionEngineError {
+                lastError = error
+                if case .parseFailed = error { throw error }
+            } catch let error as URLError {
+                lastError = error
+            } catch {
+                throw error
+            }
+        }
+        throw lastError
     }
 
     static func performCall(endpoint: URL, apiKey: String, model: String, imageData: Data, context: MealContext) async throws -> FoodAnalysis {
