@@ -219,19 +219,45 @@ struct SettingsView: View {
 
     private var dataSection: some View {
         Section {
-            Toggle(isOn: $icloudSyncEnabled) {
+            HStack {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("iCloud Sync (optional)")
+                    Text("iCloud Sync (Pro)")
                         .font(.headline)
                     Text("Sync your logs across devices via CloudKit")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
+                Spacer()
+                if purchaseManager.isPro {
+                    Toggle("", isOn: $icloudSyncEnabled)
+                        .labelsHidden()
+                } else {
+                    Image(systemName: "lock.fill")
+                        .foregroundStyle(.secondary)
+                }
             }
+            .contentShape(Rectangle())
+            .onTapGesture {
+                if !purchaseManager.isPro { showPaywall = true }
+            }
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("iCloud Sync, Pro feature")
             Button {
-                showCSVPicker = true
+                if purchaseManager.isPro {
+                    showCSVPicker = true
+                } else {
+                    showPaywall = true
+                }
             } label: {
-                Label("Import CSV (MyFitnessPal / Lose It!)", systemImage: "square.and.arrow.down")
+                HStack {
+                    Label("Import CSV (MyFitnessPal / Lose It!)", systemImage: "square.and.arrow.down")
+                    Spacer()
+                    if !purchaseManager.isPro {
+                        Image(systemName: "lock.fill")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                }
             }
             Button {
                 showExportSheet = true
@@ -246,7 +272,7 @@ struct SettingsView: View {
         } header: {
             Text("Data")
         } footer: {
-            Text("Photos stay on this device. iCloud sync is optional and uses Apple's encrypted CloudKit.")
+            Text("Photos stay on this device. iCloud Sync and CSV import are Pro features; exporting your data is always free.")
         }
     }
 
