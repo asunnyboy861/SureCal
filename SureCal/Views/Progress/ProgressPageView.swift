@@ -35,6 +35,8 @@ struct ProgressPageView: View {
                     gapAdviceCard
                 }
                 .padding()
+                .frame(maxWidth: 720)
+                .frame(maxWidth: .infinity)
             }
             .background(Color(.systemGroupedBackground))
             .navigationTitle("Progress")

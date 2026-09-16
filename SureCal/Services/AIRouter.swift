@@ -23,7 +23,7 @@ enum AIRouter {
     }
 
     static func verifyEngine() -> VisionNutritionEngine {
-        return GLMFlashVisionEngine()
+        GLMFlashVisionEngine(temperature: 0.8)
     }
 
     static func isHardCase(_ analysis: FoodAnalysis) -> Bool {

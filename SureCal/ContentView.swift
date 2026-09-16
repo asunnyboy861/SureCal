@@ -21,6 +21,10 @@ struct ContentView: View {
             .task {
                 let defaults = UserDefaults.standard
                 defaults.set(defaults.integer(forKey: "app.launchCount") + 1, forKey: "app.launchCount")
+                if defaults.bool(forKey: "notification.permissionAsked") == false {
+                    NotificationHelper.requestPermission()
+                    defaults.set(true, forKey: "notification.permissionAsked")
+                }
                 await AdaptiveTDEERunner.runWeeklyAdjustmentIfNeeded()
             }
         } else {

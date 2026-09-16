@@ -15,8 +15,18 @@ struct ScanResultView: View {
     @State private var startedAt = Date()
     @State private var saved = false
     @State private var showQuiz = false
-    @State private var mealType = "lunch"
-    @State private var calibrationLookup: CalibrationRecord?
+    @State private var mealType = Self.defaultMealType()
+
+    nonisolated static func defaultMealType(date: Date = Date()) -> String {
+        let hour = Calendar.current.component(.hour, from: date)
+        switch hour {
+        case 5..<11: return "breakfast"
+        case 11..<15: return "lunch"
+        case 15..<17: return "snack"
+        case 17..<22: return "dinner"
+        default: return "snack"
+        }
+    }
 
     var body: some View {
         NavigationStack {
@@ -111,7 +121,7 @@ struct ScanResultView: View {
         .sheet(isPresented: $showQuiz) {
             QuickQuizView(analysis: analysis) { quizGrams, oilGrams in
                 applyQuizResult(analysis: analysis, quizGrams: quizGrams, oilGrams: oilGrams)
-                save(analysis)
+                save()
             }
         }
     }
@@ -165,7 +175,7 @@ struct ScanResultView: View {
                 if step == .quickQuiz {
                     showQuiz = true
                 } else {
-                    save(analysis)
+                    save()
                 }
             } label: {
                 Text(step == .quickQuiz ? "Quick Quiz (5 sec)" : "Looks right ✓")
@@ -258,8 +268,8 @@ struct ScanResultView: View {
         }
     }
 
-    private func save(_ analysis: FoodAnalysis) {
-        guard !saved else { return }
+    private func save() {
+        guard !saved, let analysis = scanAnalysis else { return }
         saved = true
         let meal = MealLog(date: Date(), mealType: mealType, source: outcome?.engineSource ?? "ai_glm")
         meal.verifiedBadge = outcome?.verified == true

@@ -24,9 +24,11 @@ enum VisionEngineError: LocalizedError {
 struct GLMFlashVisionEngine: VisionNutritionEngine {
     let engineID = "ai_glm"
     let profiles: [GLMProfile]
+    let temperature: Double
 
-    init(profiles: [GLMProfile]? = nil) {
+    init(profiles: [GLMProfile]? = nil, temperature: Double = 0.2) {
         self.profiles = profiles ?? GLMConfig.profiles
+        self.temperature = temperature
     }
 
     func analyze(imageData: Data, context: MealContext) async throws -> FoodAnalysis {
@@ -34,7 +36,7 @@ struct GLMFlashVisionEngine: VisionNutritionEngine {
         var lastError: Error = VisionEngineError.badResponse
         for profile in profiles {
             do {
-                return try await Self.performCall(endpoint: profile.endpoint, apiKey: profile.apiKey, model: profile.model, imageData: imageData, context: context)
+                return try await Self.performCall(endpoint: profile.endpoint, apiKey: profile.apiKey, model: profile.model, imageData: imageData, context: context, temperature: temperature)
             } catch let error as VisionEngineError {
                 lastError = error
                 if case .parseFailed = error { throw error }
@@ -47,7 +49,7 @@ struct GLMFlashVisionEngine: VisionNutritionEngine {
         throw lastError
     }
 
-    static func performCall(endpoint: URL, apiKey: String, model: String, imageData: Data, context: MealContext) async throws -> FoodAnalysis {
+    static func performCall(endpoint: URL, apiKey: String, model: String, imageData: Data, context: MealContext, temperature: Double = 0.2) async throws -> FoodAnalysis {
         var request = URLRequest(url: endpoint)
         request.httpMethod = "POST"
         request.timeoutInterval = GLMConfig.timeout
@@ -58,7 +60,7 @@ struct GLMFlashVisionEngine: VisionNutritionEngine {
         let prompt = Self.nutritionPrompt(context: context)
         let body: [String: Any] = [
             "model": model,
-            "temperature": 0.2,
+            "temperature": temperature,
             "messages": [[
                 "role": "user",
                 "content": [

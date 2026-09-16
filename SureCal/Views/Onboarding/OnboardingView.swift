@@ -136,6 +136,7 @@ struct OnboardingView: View {
             }
             Button {
                 targetKcal = computedTarget
+                NotificationHelper.requestPermission()
                 onboardingComplete = true
             } label: {
                 Text("Start Tracking")

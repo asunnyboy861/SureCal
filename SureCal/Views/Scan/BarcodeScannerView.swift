@@ -133,26 +133,59 @@ struct BarcodeScannerRepresentable: UIViewRepresentable {
 
     func makeUIView(context: Context) -> UIView {
         let view = UIView()
+        view.backgroundColor = .systemBackground
+        switch AVCaptureDevice.authorizationStatus(for: .video) {
+        case .denied, .restricted:
+            showDeniedLabel(on: view)
+        default:
+            AVCaptureDevice.requestAccess(for: .video) { granted in
+                DispatchQueue.main.async {
+                    if granted {
+                        startSession(in: view, coordinator: context.coordinator)
+                    } else {
+                        showDeniedLabel(on: view)
+                    }
+                }
+            }
+        }
+        return view
+    }
+
+    private func startSession(in view: UIView, coordinator: Coordinator) {
         let session = AVCaptureSession()
         guard let device = AVCaptureDevice.default(for: .video),
               let input = try? AVCaptureDeviceInput(device: device), session.canAddInput(input) else {
-            DispatchQueue.main.async { onFound("") }
-            return view
+            coordinator.onFound("")
+            return
         }
         session.addInput(input)
         let output = AVCaptureMetadataOutput()
         if session.canAddOutput(output) {
             session.addOutput(output)
-            output.setMetadataObjectsDelegate(context.coordinator, queue: .main)
+            output.setMetadataObjectsDelegate(coordinator, queue: .main)
             output.metadataObjectTypes = [.ean8, .ean13, .upce, .code128]
         }
         let layer = AVCaptureVideoPreviewLayer(session: session)
         layer.videoGravity = .resizeAspectFill
         layer.frame = UIScreen.main.bounds
         view.layer.addSublayer(layer)
-        context.coordinator.session = session
+        coordinator.session = session
         DispatchQueue.global(qos: .userInitiated).async { session.startRunning() }
-        return view
+    }
+
+    private func showDeniedLabel(on view: UIView) {
+        let label = UILabel()
+        label.text = "Camera access is off.\nEnable it in Settings to scan barcodes."
+        label.numberOfLines = 0
+        label.textAlignment = .center
+        label.textColor = .secondaryLabel
+        label.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(label)
+        NSLayoutConstraint.activate([
+            label.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            label.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+            label.leadingAnchor.constraint(greaterThanOrEqualTo: view.leadingAnchor, constant: 24)
+        ])
     }
 
     func updateUIView(_ uiView: UIView, context: Context) {}

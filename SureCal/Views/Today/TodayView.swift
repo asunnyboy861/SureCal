@@ -34,6 +34,8 @@ struct TodayView: View {
                     mealCards
                 }
                 .padding(.horizontal)
+                .frame(maxWidth: 720)
+                .frame(maxWidth: .infinity)
                 .padding(.bottom, 24)
             }
             .background(Color(.systemGroupedBackground))

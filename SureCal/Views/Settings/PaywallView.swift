@@ -42,7 +42,16 @@ struct PaywallView: View {
                         }
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
-                        ProgressView()
+                        if purchaseManager.isLoading {
+                            ProgressView()
+                        } else {
+                            Button {
+                                Task { await purchaseManager.loadProducts() }
+                            } label: {
+                                Label("Retry", systemImage: "arrow.clockwise")
+                                    .font(.subheadline)
+                            }
+                        }
                     } else {
                         ForEach(purchaseManager.products, id: \.id) { product in
                             productButton(product)
