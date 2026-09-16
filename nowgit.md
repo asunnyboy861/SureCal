@@ -11,9 +11,9 @@
 | **Primary Language** | Swift |
 | **GitHub Pages** | ✅ **ENABLED** (from `/docs` folder) |
 
-## Security Note — Embedded GLM API Key
+## Security Note — GLM API Key Handling
 
-`SureCal/Services/GLMConfig.swift` intentionally embeds the developer-subsidized GLM-5.3-Flash API key. This is a **product design requirement** (the app ships with a built-in AI engine so it works out of the box; cost is capped at <$0.002/free user/month). The key is rotated easily via `GLMConfig.apiKey`. Users may also supply their own key (BYO, stored in Keychain), which takes priority over the built-in engine. If key abuse is ever detected, rotate the key in `GLMConfig.swift` and/or enforce server-side rate limits via App Store Connect + a proxy.
+The GLM-5.3-Flash API key is **NOT stored in this repository**. `SureCal/Services/GLMConfig.swift` reads the key at runtime from a bundled `GLMSecret.txt` file that is **gitignored** (`SureCal/GLMSecret.txt`, kept only on the developer machine and packaged into release builds). Fresh clones build successfully, but the built-in AI engine is disabled until the developer adds their local `GLMSecret.txt` — users can always fall back to BYO API key (Settings - AI Engine, stored in Keychain). History was rewritten with git-filter-repo and the repository was force-pushed to purge an earlier accidental exposure; the key should still be rotated on bigmodel.cn as a precaution.
 
 ## Build & Test Verification (this commit)
 
