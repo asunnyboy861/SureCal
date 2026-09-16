@@ -66,7 +66,9 @@
 
 ### 💡 使用提示（非开发者配置，App 内操作即可）
 
-**BYO API Key（Cloud Boost）**：App 默认使用内嵌 GLM-5.3-Flash 引擎（免费额度 3 次/月，Pro 无限）。Pro 用户可在 **Settings → AI Engine → Custom API** 填入自己的任何 OpenAI 兼容 Key（GLM/DeepSeek/OpenAI 等），即按用户自己账户无限次扫描，Key 仅存本机 Keychain。这是用户操作，非开发者配置。
+**BYO API Key（Cloud Boost）**：App 默认使用内嵌 GLM-5.3-Flash 引擎（免费额度 3 次/月，Pro 无限）。**双区域端点自动切换**：美国/海外用户优先走 Z.ai 国际端点（`api.z.ai`，延迟最优），失败自动切回国内 `open.bigmodel.cn`。Pro 用户可在 **Settings → AI Engine → Custom API** 填入自己的任何 OpenAI 兼容 Key（GLM/DeepSeek/OpenAI 等），按用户自己账户无限次扫描，Key 仅存本机 Keychain。这是用户操作，非开发者配置。
+
+**密钥安全（重要）**：GLM API Key 存放在本地 `SureCal/GLMSecret.txt`（格式：每行一条 `API_KEY|端点|模型`），该文件已被 .gitignore 保护，**永不推送到 GitHub**，仅随本机构建打包进 App。更换/轮换密钥只需编辑此文件后重新构建，无需改代码。
 
 ---
 
